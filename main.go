@@ -68,10 +68,10 @@ type Bot struct {
 }
 
 type Alerts struct {
-	BTC pq.Float64Array `gorm:"column:cluster;type:float[]"`
-	USD pq.Float64Array `gorm:"column:cluster;type:float[]"`
-	EUR pq.Float64Array `gorm:"column:cluster;type:float[]"`
-	CNY pq.Float64Array `gorm:"column:cluster;type:float[]"`
+	BTC pq.Float64Array `gorm:"column:btc;type:float[]"`
+	USD pq.Float64Array `gorm:"column:usd;type:float[]"`
+	EUR pq.Float64Array `gorm:"column:eur;type:float[]"`
+	CNY pq.Float64Array `gorm:"column:cny;type:float[]"`
 }
 
 type Notifier struct {
@@ -136,7 +136,7 @@ func (b *Bot) newNotifier(chatId int64) *Notifier {
 
 	b.notifiers[chatId] = n
 
-	b.db.Save(n)
+	b.db.Create(n)
 
 	return n
 }
