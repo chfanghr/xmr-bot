@@ -427,23 +427,23 @@ const alertHelpMessage = `
 Usage: /xmrAlert <Subcommand>
 
 Subcommands:
-	- help
-		Show this help message.
-	- list
-		List all alerts. 
-		Each row of the response message present an alert, which is organized with the following format:
-			<index> <price>
-		The index can be used to remove an alert.
-	- add <currency> <price>
-		Add a alert
-		- currency 
-			Could be one of btc,usd,eur end cny
-		- price
-			A number
-	- remove <currency> <index>
-		Remove an alert. 
-	- removeAll
-		Remove all the alerts.
+    - help
+        Show this help message.
+    - list
+        List all alerts. 
+        Each row of the response message present an alert, which is organized with the following format:
+          <index> <price>
+        The index can be used to remove an alert.
+    - add <currency> <price>
+        Add a alert
+        - currency 
+          Could be one of btc,usd,eur end cny
+        - price
+          A number
+    - remove <currency> <index>
+        Remove an alert. 
+    - removeAll
+        Remove all the alerts.
 `
 
 func (b *Bot) handleAlertCommand(m *telebot.Message) {
@@ -454,6 +454,7 @@ func (b *Bot) handleAlertCommand(m *telebot.Message) {
 		"add":       b.addAlert,
 		"remove":    b.removeAlert,
 		"removeAll": b.removeAllAlert,
+		"list":      b.listAlerts,
 	}
 
 	if len(cmdComponents) < 2 {
