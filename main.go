@@ -119,11 +119,17 @@ const (
 )
 
 func newNotifier(initialPrice XMRPrice, bot *Bot, chatId int64) *Notifier {
+	if _, ok := bot.notifiers[chatId]; ok {
+		return bot.notifiers[chatId]
+	}
+
 	n := &Notifier{
 		lastPrice: initialPrice,
 		bot:       bot,
 		ChatId:    chatId,
 	}
+
+	bot.notifiers[chatId] = n
 
 	bot.db.Save(n)
 
@@ -524,17 +530,16 @@ func (b *Bot) addAlert(chatId int64, parameters []string) (string, error) {
 
 func (b *Bot) getNotifier(chatId int64) *Notifier {
 	b.notifiersMu.RLock()
-        if notifier, ok := b.notifiers[chatId]; ok {
+	if notifier, ok := b.notifiers[chatId]; ok {
 		b.notifiersMu.RUnlock()
-                return notifier
+		return notifier
 	} else {
-                b.notifiersMu.RUnlock()
-                b.notifiersMu.Lock()
+		b.notifiersMu.RUnlock()
+		b.notifiersMu.Lock()
 		b.xmrPriceMu.RLock()
 		n := newNotifier(b.currentPrice, b, chatId)
+		b.xmrPriceMu.RUnlock()
 		b.notifiersMu.Unlock()
-                b.xmrPriceMu.RUnlock()
-		b.notifiers[chatId] = n
 		return n
 	}
 }
@@ -688,6 +693,7 @@ func (x *XMRPriceFetcher) FetchPrice() (XMRPrice, error) {
 		return XMRPrice{}, err
 	}
 
+	//goland:noinspection GoUnhandledErrorResult
 	defer resp.Body.Close()
 
 	var price XMRPrice
