@@ -35,8 +35,8 @@ type Config struct {
 	} `json:"database"`
 
 	Log struct {
-		File  string    `json:"file"`
-		Level log.Level `json:"level"`
+		File  string `json:"file"`
+		Level uint32 `json:"level"`
 	} `json:"log"`
 
 	Network struct {
@@ -320,7 +320,7 @@ func NewBot(config Config) (bot *Bot, err error) {
 		}
 	}
 
-	bot.logger.SetLevel(config.Log.Level)
+	bot.logger.SetLevel(log.Level(config.Log.Level))
 
 	// Set up xmr
 	if bot.xmr, err = NewXMRPriceFetcher(config); err != nil {
