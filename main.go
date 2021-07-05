@@ -690,7 +690,7 @@ func (x *XMRPriceFetcher) worker(duration int, apiKey string, ctx context.Contex
 		select {
 		case <-ctx.Done():
 			return
-		case <-time.NewTimer(time.Duration(duration)).C:
+		case <-time.NewTimer(time.Second * time.Duration(duration)).C:
 			x.fetchPrice(apiKey)
 		}
 	}
