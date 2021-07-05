@@ -118,20 +118,21 @@ const (
 	CNY
 )
 
-func newNotifier(initialPrice XMRPrice, bot *Bot, chatId int64) *Notifier {
-	if _, ok := bot.notifiers[chatId]; ok {
-		return bot.notifiers[chatId]
+func (b *Bot) newNotifier(chatId int64) *Notifier {
+	// recheck if the requested notifier has already been created
+	if _, ok := b.notifiers[chatId]; ok {
+		return b.notifiers[chatId]
 	}
 
 	n := &Notifier{
-		lastPrice: initialPrice,
-		bot:       bot,
+		lastPrice: b.currentPrice,
+		bot:       b,
 		ChatId:    chatId,
 	}
 
-	bot.notifiers[chatId] = n
+	b.notifiers[chatId] = n
 
-	bot.db.Save(n)
+	b.db.Save(n)
 
 	return n
 }
@@ -537,7 +538,7 @@ func (b *Bot) getNotifier(chatId int64) *Notifier {
 		b.notifiersMu.RUnlock()
 		b.notifiersMu.Lock()
 		b.xmrPriceMu.RLock()
-		n := newNotifier(b.currentPrice, b, chatId)
+		n := b.newNotifier(chatId)
 		b.xmrPriceMu.RUnlock()
 		b.notifiersMu.Unlock()
 		return n
