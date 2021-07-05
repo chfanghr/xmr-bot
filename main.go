@@ -523,12 +523,17 @@ func (b *Bot) addAlert(chatId int64, parameters []string) (string, error) {
 }
 
 func (b *Bot) getNotifier(chatId int64) *Notifier {
-	if notifier, ok := b.notifiers[chatId]; ok {
-		return notifier
+	b.notifiersMu.RLock()
+        if notifier, ok := b.notifiers[chatId]; ok {
+		b.notifiersMu.RUnlock()
+                return notifier
 	} else {
+                b.notifiersMu.RUnlock()
+                b.notifiersMu.Lock()
 		b.xmrPriceMu.RLock()
 		n := newNotifier(b.currentPrice, b, chatId)
-		b.xmrPriceMu.RUnlock()
+		b.notifiersMu.Unlock()
+                b.xmrPriceMu.Unlock()
 		b.notifiers[chatId] = n
 		return n
 	}
