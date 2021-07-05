@@ -15,6 +15,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"os/signal"
 	"sort"
 	"strconv"
 	"strings"
@@ -609,6 +610,12 @@ func (b *Bot) Stop() {
 
 func (b *Bot) Run() {
 	b.tb.Start()
+
+	signalChannel := make(chan os.Signal)
+	signal.Notify(signalChannel, os.Interrupt, os.Kill)
+
+	<-signalChannel
+	b.Stop()
 }
 
 const XMRPriceAPIEndpoint = "https://min-api.cryptocompare.com/data/price?fsym=XMR&tsyms=BTC,USD,EUR,CNY"
