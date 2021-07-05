@@ -18,7 +18,8 @@
     "_comment": "This is for *Poor* Chinese users. Format: (socks5|http|https)://<some address>"
   },
   "xmr": {
+    "crypto_compare_api_key": "<CRYPTOCOMPARE.COM API KEY HERE>",
     "fetch_duration": 5,
-    "_comment": "The `fetch_duration` is optional. "
+    "_comment": "The `fetch_duration` is optional. Get your at https://min-api.cryptocompare.com"
   }
 }
