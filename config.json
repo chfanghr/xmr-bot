@@ -11,7 +11,7 @@
   "log": {
     "file": "<OPTIONAL LOG FILE>",
     "Level": 3,
-    "_comment": "For verbose log, set Level to 4/5/6."
+    "_comment": "For verbose log, set level to 4/5/6."
   },
   "network": {
     "proxy": "<OPTIONAL PROXY SETTING>",
