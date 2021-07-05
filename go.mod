@@ -1,4 +1,4 @@
-module xmr-bot
+module github.com/chfanghr/xmr-bot
 
 go 1.16
 
