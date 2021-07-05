@@ -280,14 +280,14 @@ func (n *Notifier) updatePrice(price XMRPrice) {
 }
 
 // Implement the following bot commands
-// - /xmrAlert help ✅
-// - /xmrAlert list ✅
-// - /xmrAlert add <currency(btc|usd|eur|cny)> <price(float64)> ✅
-// - /xmrAlert remove <currency(btc|usd|eur|cny)> <index(int)> ✅
-// - /xmrPrice ✅
+// - /xmralert help ✅
+// - /xmralert list ✅
+// - /xmralert add <currency(btc|usd|eur|cny)> <price(float64)> ✅
+// - /xmralert remove <currency(btc|usd|eur|cny)> <index(int)> ✅
+// - /xmrprice ✅
 
-const AlertCommand = "/xmrAlert"
-const PriceCommand = "/xmrPrice"
+const AlertCommand = "/xmralert"
+const PriceCommand = "/xmrprice"
 
 const MysqlDatabaseKind = "mysql"
 const SqliteDatabaseKind = "sqlite"
@@ -424,7 +424,7 @@ func (b *Bot) sendStringMessage(to telebot.Recipient, msg string) {
 }
 
 const alertHelpMessage = `
-Usage: /xmrAlert <Subcommand>
+Usage: /xmralert <Subcommand>
 
 Subcommands:
     - help
