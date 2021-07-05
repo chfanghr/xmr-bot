@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/tucnak/telebot.v2"
 	"gorm.io/driver/mysql"
@@ -66,17 +67,19 @@ type Bot struct {
 	sendMsgMu sync.Mutex
 }
 
+type Alerts struct {
+	BTC pq.Float64Array `gorm:"column:cluster;type:float[]"`
+	USD pq.Float64Array `gorm:"column:cluster;type:float[]"`
+	EUR pq.Float64Array `gorm:"column:cluster;type:float[]"`
+	CNY pq.Float64Array `gorm:"column:cluster;type:float[]"`
+}
+
 type Notifier struct {
 	bot       *Bot
 	lastPrice XMRPrice
 
-	ChatId int64 `gorm:"primaryKey"`
-	Alerts struct {
-		BTC []float64
-		USD []float64
-		EUR []float64
-		CNY []float64
-	} `gorm:"embedded"`
+	ChatId int64  `gorm:"primaryKey"`
+	Alerts Alerts `gorm:"embedded"`
 }
 
 type alertKind int
@@ -139,7 +142,7 @@ func (b *Bot) newNotifier(chatId int64) *Notifier {
 }
 
 func loadAllNotifiersFromDatabase(initialPrice XMRPrice, bot *Bot) (map[int64]*Notifier, error) {
-	var notifiers []Notifier
+	notifiers := make([]Notifier, 0)
 	notifierMaps := make(map[int64]*Notifier)
 	err := bot.db.Find(&notifiers).Error
 	for _, notifier := range notifiers {
@@ -352,6 +355,11 @@ func NewBot(config Config) (bot *Bot, err error) {
 		return nil, err
 	}
 
+	if err := bot.db.AutoMigrate(&Notifier{}); err != nil {
+		bot.logger.Errorf("failed to migrate database: %v", err)
+		return nil, err
+	}
+
 	bot.notifiers, err = loadAllNotifiersFromDatabase(bot.currentPrice, bot)
 	if err != nil {
 		bot.logger.Errorf("failed to load notifiers: %v", err)
@@ -406,8 +414,12 @@ func (b *Bot) sendStringMessage(to telebot.Recipient, msg string) {
 		for i := 0; i < TryLimit; i++ {
 			if _, err := b.tb.Send(to, msg); err != nil {
 				b.logger.Warnf("failed to send message: %v", err)
+			} else {
+				return
 			}
 		}
+
+		b.logger.Warnf("unable to deliver message %v to %v", msg, to)
 	}()
 }
 
