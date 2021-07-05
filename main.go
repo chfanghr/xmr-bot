@@ -45,7 +45,8 @@ type Config struct {
 	} `json:"network"`
 
 	XMR struct {
-		FetchDuration int `json:"fetch_duration"` // default: 5s
+		CryptoCompareAPIKey string `json:"crypto_compare_api_key"`
+		FetchDuration       int    `json:"fetch_duration"` // default: 10s
 	} `json:"xmr"`
 }
 
@@ -330,7 +331,7 @@ func NewBot(config Config) (bot *Bot, err error) {
 		return nil, err
 	}
 
-	price, err := bot.xmr.FetchPrice()
+	price, err := bot.xmr.FetchPrice(config.XMR.CryptoCompareAPIKey)
 	if err != nil {
 		bot.logger.Errorf("failed to fetch xmr price: %v", err)
 		return nil, err
@@ -631,7 +632,7 @@ func (b *Bot) Run() {
 	b.Stop()
 }
 
-const XMRPriceAPIEndpoint = "https://min-api.cryptocompare.com/data/price?fsym=XMR&tsyms=BTC,USD,EUR,CNY"
+const XMRPriceAPIEndpoint = "https://min-api.cryptocompare.com/data/price?fsym=XMR&tsyms=BTC,USD,EUR,CNY&apiKey=%s"
 
 type XMRPrice struct {
 	BTC float64 `json:"BTC"`
@@ -684,19 +685,19 @@ func (x *XMRPriceFetcher) Subscribe(subFunc func(XMRPrice)) {
 	x.subFuncs = append(x.subFuncs, subFunc)
 }
 
-func (x *XMRPriceFetcher) worker(duration int, ctx context.Context) {
+func (x *XMRPriceFetcher) worker(duration int, apiKey string, ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		case <-time.NewTimer(time.Duration(duration)).C:
-			x.fetchPrice()
+			x.fetchPrice(apiKey)
 		}
 	}
 }
 
-func (x *XMRPriceFetcher) fetchPrice() {
-	newPrice, err := x.FetchPrice()
+func (x *XMRPriceFetcher) fetchPrice(apiKey string) {
+	newPrice, err := x.FetchPrice(apiKey)
 	if err != nil {
 		return
 	}
@@ -706,8 +707,8 @@ func (x *XMRPriceFetcher) fetchPrice() {
 	}
 }
 
-func (x *XMRPriceFetcher) FetchPrice() (XMRPrice, error) {
-	resp, err := x.client.Get(XMRPriceAPIEndpoint)
+func (x *XMRPriceFetcher) FetchPrice(apiKey string) (XMRPrice, error) {
+	resp, err := x.client.Get(fmt.Sprintf(XMRPriceAPIEndpoint, apiKey))
 
 	if err != nil {
 		x.logger.Warnf("failed to fetch xmr price: %v", err)
@@ -752,17 +753,17 @@ func NewXMRPriceFetcher(config Config) (*XMRPriceFetcher, error) {
 
 	duration := config.XMR.FetchDuration
 	if duration <= 0 {
-		duration = 5 // fetch price every 5s by default
+		duration = 10 // fetch price every 10s by default
 	}
 
-	fetcher.fetchPrice() // fetch initial price
+	fetcher.fetchPrice(config.XMR.CryptoCompareAPIKey) // fetch initial price
 
 	// Bootstrap worker
 
 	workerCtx, cancelFunc := context.WithCancel(context.Background())
 	fetcher.cancelFunc = cancelFunc
 
-	go fetcher.worker(duration, workerCtx)
+	go fetcher.worker(duration, config.XMR.CryptoCompareAPIKey, workerCtx)
 
 	return fetcher, nil
 }
