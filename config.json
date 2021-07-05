@@ -1,0 +1,24 @@
+{
+  "telegram": {
+    "bot_token": "<YOUR BOT TOKEN HERE>",
+    "_comment": "Get your bot token from @BotFather."
+  },
+  "database":{
+    "kind": "<sqlite OR mysql>",
+    "dsn": "<DSN HERE>",
+    "_comment": "You can also set the environmental variable MYSQL_DATABASE_DSN in case you want to deploy using docker compose."
+  },
+  "log": {
+    "file": "<OPTIONAL LOG FILE>",
+    "Level": 3,
+    "_comment": "For verbose log, set Level to 4/5/6."
+  },
+  "network": {
+    "proxy": "<OPTIONAL PROXY SETTING>",
+    "_comment": "This is for *Poor* Chinese users. Format: (socks5|http|https)://<some address>"
+  },
+  "xmr": {
+    "fetch_duration": 5,
+    "_comment": "The `fetch_duration` is optional. "
+  }
+}

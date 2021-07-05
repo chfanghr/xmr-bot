@@ -43,7 +43,7 @@ type Config struct {
 	} `json:"network"`
 
 	XMR struct {
-		FetchDuration int `json:"fetch_duration"`
+		FetchDuration int `json:"fetch_duration"` // default: 5s
 	} `json:"xmr"`
 }
 
