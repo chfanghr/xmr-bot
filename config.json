@@ -20,6 +20,6 @@
   "xmr": {
     "crypto_compare_api_key": "<CRYPTOCOMPARE.COM API KEY HERE>",
     "fetch_duration": 5,
-    "_comment": "The `fetch_duration` is optional. Get your at https://min-api.cryptocompare.com"
+    "_comment": "The `fetch_duration` is optional. Get your api key at https://min-api.cryptocompare.com"
   }
 }
