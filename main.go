@@ -664,10 +664,10 @@ func (x XMRPrice) compareWithKind(kind alertKind, val float64) bool {
 func (x XMRPrice) String() string {
 	return fmt.Sprintf(`
 Current XMR Price
-	BTC: %v
-	USD: %v
-	EUR: %v
-	CNY: %v
+    BTC: %v
+    USD: %v
+    EUR: %v
+    CNY: %v
 `, x.BTC, x.USD, x.EUR, x.CNY)
 }
 
