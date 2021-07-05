@@ -533,7 +533,7 @@ func (b *Bot) getNotifier(chatId int64) *Notifier {
 		b.xmrPriceMu.RLock()
 		n := newNotifier(b.currentPrice, b, chatId)
 		b.notifiersMu.Unlock()
-                b.xmrPriceMu.Unlock()
+                b.xmrPriceMu.RUnlock()
 		b.notifiers[chatId] = n
 		return n
 	}
