@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/tucnak/telebot.v2"
@@ -10,6 +11,7 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -594,6 +596,10 @@ func (b *Bot) Stop() {
 	b.xmr.Stop()
 }
 
+func (b *Bot) Run() {
+	b.tb.Start()
+}
+
 const XMRPriceAPIEndpoint = "https://min-api.cryptocompare.com/data/price?fsym=XMR&tsyms=BTC,USD,EUR,CNY"
 
 type XMRPrice struct {
@@ -671,12 +677,13 @@ func (x *XMRPriceFetcher) fetchPrice() {
 
 func (x *XMRPriceFetcher) FetchPrice() (XMRPrice, error) {
 	resp, err := x.client.Get(XMRPriceAPIEndpoint)
-	defer resp.Body.Close()
 
 	if err != nil {
 		x.logger.Warnf("failed to fetch xmr price: %v", err)
 		return XMRPrice{}, err
 	}
+
+	defer resp.Body.Close()
 
 	var price XMRPrice
 
@@ -728,6 +735,28 @@ func NewXMRPriceFetcher(config Config) (*XMRPriceFetcher, error) {
 	return fetcher, nil
 }
 
-func main() {
+var config = flag.String("config", "config.json", "path to config file")
 
+func main() {
+	flag.Parse()
+
+	data, err := ioutil.ReadFile(*config)
+
+	if err != nil {
+		log.Fatalf("failed to read configuration file: %v", err)
+	}
+
+	var config Config
+
+	if err := json.Unmarshal(data, &config); err != nil {
+		log.Fatalf("failed to decode configuration file: %v", err)
+	}
+
+	bot, err := NewBot(config)
+
+	if err != nil {
+		log.Fatalf("failed to setup bot: %v", err)
+	}
+
+	bot.Run()
 }
