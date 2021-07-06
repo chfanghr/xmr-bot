@@ -373,7 +373,7 @@ func NewBot(config Config) (bot *Bot, err error) {
 	if config.Network.Proxy != "" {
 		proxyUrl, err := url.Parse(config.Network.Proxy)
 		if err != nil {
-			bot.logger.Errorf("failed to setup proxy: %v", err)
+			bot.logger.Errorf("failed to set up proxy: %v", err)
 			return nil, err
 		}
 
@@ -424,6 +424,7 @@ func (b *Bot) sendStringMessage(to telebot.Recipient, msg string) {
 	}()
 }
 
+//goland:noinspection GrazieInspection
 const alertHelpMessage = `
 Usage: /xmralert <Subcommand>
 
@@ -432,7 +433,7 @@ Subcommands:
         Show this help message.
     - list
         List all alerts. 
-        Each row of the response message present an alert, which is organized with the following format:
+        Each row of the response message presents an alert, which is organized in the following format:
           <index> <price>
         The index can be used to remove an alert.
     - add <currency> <price>
@@ -788,7 +789,7 @@ func main() {
 	bot, err := NewBot(config)
 
 	if err != nil {
-		log.Fatalf("failed to setup bot: %v", err)
+		log.Fatalf("failed to set up bot: %v", err)
 	}
 
 	bot.Run()

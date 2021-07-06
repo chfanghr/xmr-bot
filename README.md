@@ -14,4 +14,5 @@ Try it here: [@xmr_alert_bot](https://t.me/xmr_alert_bot)
 * Get realtime xmr price
 
 ## License
-This project is licensed under [MIT](LICENSE).
+
+This project is being licensed under [MIT](LICENSE).
